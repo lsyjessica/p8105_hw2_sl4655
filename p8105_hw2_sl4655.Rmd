@@ -1,0 +1,60 @@
+---
+title: "p8105_hw2_sl4655"
+author: "Shuya Liu"
+date: "October 2, 2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+```
+
+# _Problem 1_
+
+### Read and clean the Mr. Trash Wheel sheet
+
+```{r trash_wheel_data_input, eval = FALSE}
+## Read in Mr. Trash Wheel data
+trash_wheel_data <- 
+  readxl::read_excel(path = "./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx",
+                     sheet = "Mr. Trash Wheel") %>%
+  janitor::clean_names() %>%
+  select(dumpster:homes_powered) %>%
+  drop_na(dumpster) %>%
+  mutate(sports_balls = round(sports_balls) %>% as.integer())
+```
+
+### Read and clean precipitation data for 2017 and 2018
+
+```{r precipitaion, eval = FALSE}
+precipitation_2017_data <- 
+  readxl::read_excel(path = "./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx",
+                     sheet = "2017 Precipitation",
+                     range = "A2:B14") %>%
+  janitor::clean_names() %>%
+  drop_na(total) %>%
+  arrange(month) %>%
+  mutate(year = 2017, month = month.name)
+
+precipitation_2018_data <-
+  readxl::read_excel(path = "./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx",
+                     sheet = "2018 Precipitation",
+                     range = "A2:B14") %>%
+  janitor::clean_names() %>%
+  drop_na(total) %>%
+  arrange(month) %>%
+  mutate(year = 2018, month = month.name)
+```
+
+### Combine precipitation datasets
+
+```{r combine, eval = FALSE}
+precipitation_combine_data <-
+  rbind(precipitation_2017_data, precipitation_2018_data) %>%
+  select(year, month, preicipitation = total)
+```
+
+* For precipitation data:
+
