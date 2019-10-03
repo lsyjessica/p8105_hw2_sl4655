@@ -67,15 +67,17 @@ max_2018 = max(with(precip_combine_data, subset(precipitation, year == 2018)))
 
 * **For precipitation data**:
 
-  The total precipitation for year 2017 is `r total_2017`(in). The total precipitation for year 2018 is `r total_2018`(in). The difference is `r total_2018 - total_2017`(in). In year 2017, the smallest amount of precipitation `r min_2017`(in) occurred in `r with(precip_combine_data, subset(month, precipitation == min_2017))`, and the largest amount of precipitation `r max_2017`(in) occurred in `r with(precip_combine_data, subset(month, precipitation == max_2017))`. In year 2018, the smallest amount of precipitation `r min_2018`(in) occurred in `r with(precip_combine_data, subset(month, precipitation == min_2018))`, and the largest amount of precipitation `r max_2018`(in) occurred in `r with(precip_combine_data, subset(month, precipitation == max_2018))`.
+  The dataset `precip_combine_data` contains `r dim(precip_combine_data)[1]` observations of `r dim(precip_combine_data)[2]` variables: `r colnames(precip_combine_data)`. The total precipitation for year 2017 is `r total_2017`(in). The total precipitation for year 2018 is `r total_2018`(in). The difference between the total amount of the two years is `r total_2018 - total_2017`(in). In year 2017, the smallest amount of precipitation `r min_2017`(in) occurred in `r subset(precip_combine_data, precipitation == min_2017 & year == 2017)$month`, and the largest amount of precipitation `r max_2017`(in) occurred in `r subset(precip_combine_data, precipitation == max_2017 & year == 2017)$month`. In year 2018, the smallest amount of precipitation `r min_2018`(in) occurred in `r subset(precip_combine_data, precipitation == min_2018 & year == 2018)$month`, and the largest amount of precipitation `r max_2018`(in) occurred in `r subset(precip_combine_data, precipitation == max_2018 & year == 2018)$month`.
 
 * **For Mr. Trash Wheel data**:
 
-  There are `r dim(trash_wheel_data)[1]` rows of data and `r dim(trash_wheel_data)[2]` variables, with `r sum(is.na(trash_wheel_data))` missing data. The data starts from `r min(trash_wheel_data$date)` to `r max(trash_wheel_data$date)`. The medians of plastic bottles, cigarette butts, grocery bags and sports balls for each year are shown as below:
+The dataset `trash_wheel_data` contains `r dim(trash_wheel_data)[1]` observations of `r dim(trash_wheel_data)[2]` variables: `r colnames(trash_wheel_data)`, with `r sum(is.na(trash_wheel_data))` missing data. The data starts from `r min(trash_wheel_data$date)` to `r max(trash_wheel_data$date)`. To interpret the data, we take the first line as an example: on `r trash_wheel_data$date[1]`, dumpster `r trash_wheel_data$dumpster[1]` collected `r trash_wheel_data$weight_tons[1]` tons of trash with a volume of `r trash_wheel_data$volume_cubic_yards[1]` cubic yards. These trash were consisted of `r trash_wheel_data$plastic_bottles[1]` plastic bottles, `r trash_wheel_data$polystyrene[1]` polystyrene, `r trash_wheel_data$cigarette_butts[1]` cigarette butts, `r trash_wheel_data$glass_bottles[1]` glass bottles, `r trash_wheel_data$grocery_bags[1]` gorcery bags, `r trash_wheel_data$chip_bags[1]` chip bags, and `r trash_wheel_data$sports_balls[1]` sports balls. And the trash generated powers for `r trash_wheel_data$homes_powered[1]` homes. (Each ton of trash equates to on average 500 kilowatts of electricity.  An average household will use 30 kilowatts per day.)
+  
+The medians of plastic_bottles, polystyrene, cigarette_butts, glass_bottles, grocery_bags, chip_bags, sports_balls for each year are shown as below:
   
 ```{r echo = FALSE}
 aggregate(
-  cbind(plastic_bottles, cigarette_butts, grocery_bags, sports_balls) ~ year, 
+  cbind(plastic_bottles, polystyrene, cigarette_butts, glass_bottles, grocery_bags, chip_bags, sports_balls) ~ year, 
   data = trash_wheel_data, 
   median)
 ```
@@ -145,8 +147,25 @@ join1_data <- left_join(pols_data, snp_data, by = c("year", "month"))
 result_data <- left_join(join1_data, unemploy_data, by = c("year", "month"))
 ```
 
-Join the datasets by merging snp into pols, and merging unemployment into the result.
+**pols-month data**:
 
-Write a short paragraph about these datasets. Explain briefly what each dataset contained, and describe the resulting dataset (e.g. give the dimension, range of years, and names of key variables).
+The dataset `pols_data` contains `r dim(pols_data)[1]` observations of `r dim(pols_data)[2]` variables, with `r sum(is.na(pols_data))` missing data, related related to the number of national politicians who are democratic or republican at any given time from `r min(pols_data$year)` to `r max(pols_data$year)`:
 
-Note: we could have used a date variable as a key instead of creating year and month keys; doing so would help with some kinds of plotting, and be a more accurate representation of the data. Date formats are tricky, though. For more information check out the lubridate package in the tidyverse.
+  * The variable `president` contains two values: `dem` represents that the president was democratic on the associated date, and `gop` respresents that the president was republican on the associated date
+  * The variables contain the names of `gov`, `sen`, `rep` represent the number of governers, senators, and representatives in each party on the associated date
+  
+**snp data**:
+
+The dataset `snp_data` contains `r dim(snp_data)[1]` observations of `r dim(snp_data)[2]` variables, with `r sum(is.na(snp_data))` missing data, related to Standard & Poor’s stock market index from `r min(snp_data$year)` to `r max(snp_data$year)`:
+
+  * The variable `snp_close` represents the closing values of the S&P stock index
+
+**umployment data**:
+
+The dataset `unemploy_data` contains `r dim(unemploy_data)[1]` observations of `r dim(unemploy_data)[2]` variables, with `r sum(is.na(unemploy_data))` missing data, related to the precentage of umemployment in each month from `r min(unemploy_data$year)` to `r max(unemploy_data$year)`:
+
+  * The variable `unemploy_rate` represents the unemployment rate of the associated month
+
+**resulting dataset**:
+
+The dataset `result_data` contains `r dim(result_data)[1]` observations of `r dim(result_data)[2]` variables from `r min(result_data$year)` to `r max(result_data$year)`, with `r sum(is.na(result_data))` missing values. The variables are `r colnames(result_data)`.
