@@ -169,3 +169,19 @@ The dataset `unemploy_data` contains `r dim(unemploy_data)[1]` observations of `
 **resulting dataset**:
 
 The dataset `result_data` contains `r dim(result_data)[1]` observations of `r dim(result_data)[2]` variables from `r min(result_data$year)` to `r max(result_data$year)`, with `r sum(is.na(result_data))` missing values. The variables are `r colnames(result_data)`.
+
+# _Problem 3_
+
+### Load and tidy the data
+
+```{r name_data, message = FALSE}
+name_data <- 
+  read_csv(file = "./data/Popular_Baby_Names.csv") %>%
+  janitor::clean_names()
+```
+
+Note that, although these data may seem fairly well formatted initially, the names of a categorical predictor and the case structure of string variables changed over time; you’ll need to address this in your data cleaning. Also, some rows seem duplicated, and these will need to be removed (hint: google something like “dplyr remove duplicate rows” to get started).
+
+Produce a well-structured, reader-friendly table showing the rank in popularity of the name “Olivia” as a female baby name over time; this should have rows for ethnicities and columns for year. Produce a similar table showing the most popular name among male children over time.
+
+Finally, for male, white non-hispanic children born in 2016, produce a scatter plot showing the number of children with a name (y axis) against the rank in popularity of that name (x axis).
