@@ -15,7 +15,7 @@ library(tidyverse)
 
 ### Read and clean the Mr. Trash Wheel sheet
 
-```{r trash_wheel_data_input, eval = FALSE}
+```{r trash_wheel_data_input, message = FALSE}
 ## Read in Mr. Trash Wheel data
 trash_wheel_data <- 
   readxl::read_excel(path = "./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx",
@@ -56,9 +56,8 @@ precip_combine_data <-
   select(year, month, precipitation = total)
 ```
 
-##### Descriptive Statistics
-
-```{r}
+```{r stats, include = FALSE}
+## Descriptive Statistics
 total_2017 = sum(with(precip_combine_data, subset(precipitation, year == 2017)))
 total_2018 = sum(with(precip_combine_data, subset(precipitation, year == 2018)))
 min_2017 = min(with(precip_combine_data, subset(precipitation, year == 2017)))
@@ -69,7 +68,48 @@ max_2018 = max(with(precip_combine_data, subset(precipitation, year == 2018)))
 
 * **For precipitation data**:
 
-The total precipitation for year 2017 is `r total_2017`(in). The total precipitation for year 2018 is `r total_2018`(in). The difference is `r total_2018 - total_2017`(in). In year 2017, the smallest amount of precipitation `r min_2017`(in) occurred in `r with(precip_combine_data, subset(month, precipitation == min_2017))`, and the largest amount of precipitation `r max_2017`(in) occurred in `r with(precip_combine_data, subset(month, precipitation == max_2017))`. In year 2018, the smallest amount of precipitation `r min_2018`(in) occurred in `r with(precip_combine_data, subset(month, precipitation == min_2018))`, and the largest amount of precipitation `r max_2018`(in) occurred in `r with(precip_combine_data, subset(month, precipitation == max_2018))`.
-
+  The total precipitation for year 2017 is `r total_2017`(in). The total precipitation for year 2018 is `r total_2018`(in). The difference is `r total_2018 - total_2017`(in). In year 2017, the smallest amount of precipitation `r min_2017`(in) occurred in `r with(precip_combine_data, subset(month, precipitation == min_2017))`, and the largest amount of precipitation `r max_2017`(in) occurred in `r with(precip_combine_data, subset(month, precipitation == max_2017))`. In year 2018, the smallest amount of precipitation `r min_2018`(in) occurred in `r with(precip_combine_data, subset(month, precipitation == min_2018))`, and the largest amount of precipitation `r max_2018`(in) occurred in `r with(precip_combine_data, subset(month, precipitation == max_2018))`.
 
 * **For Mr. Trash Wheel data**:
+
+  There are `r dim(trash_wheel_data)[1]` rows of data and `r dim(trash_wheel_data)[2]` variables, with `r sum(is.na(trash_wheel_data))` missing data. The data starts from `r min(trash_wheel_data$date)` to `r max(trash_wheel_data$date)`. The medians of plastic bottles, cigarette butts, grocery bags and sports balls for each year are shown as below:
+  
+```{r echo = FALSE}
+aggregate(
+  cbind(plastic_bottles, cigarette_butts, grocery_bags, sports_balls) ~ year, 
+  data = trash_wheel_data, 
+  median)
+```
+
+The total amount of weight(tons), and volume(cubic_yards), and homes powered for each year are shown as below:
+
+```{r echo = FALSE}
+aggregate(
+  cbind(weight_tons, volume_cubic_yards, homes_powered) ~ year,
+  data = trash_wheel_data,
+  sum
+)
+```
+
+# _Problem 2_
+
+### Clean the data in pols-month.csv
+```{r pols_month}
+pols_data <- 
+  read_csv(file = "./data/fivethirtyeight_datasets/pols-month.csv") %>%
+  janitor::clean_names()
+```
+
+
+
+First, clean the data in pols-month.csv. Use separate() to break up the variable mon into integer variables year, month, and day; replace month number with month name; create a president variable taking values gop and dem, and remove prez_dem and prez_gop; and remove the day variable.
+
+Second, clean the data in snp.csv using a similar process to the above. For consistency across datasets, arrange according to year and month, and organize so that year and month are the leading columns.
+
+Third, tidy the unemployment data so that it can be merged with the previous datasets. This process will involve switching from “wide” to “long” format; ensuring that key variables have the same name; and ensuring that key variables take the same values.
+
+Join the datasets by merging snp into pols, and merging unemployment into the result.
+
+Write a short paragraph about these datasets. Explain briefly what each dataset contained, and describe the resulting dataset (e.g. give the dimension, range of years, and names of key variables).
+
+Note: we could have used a date variable as a key instead of creating year and month keys; doing so would help with some kinds of plotting, and be a more accurate representation of the data. Date formats are tricky, though. For more information check out the lubridate package in the tidyverse.
