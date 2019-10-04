@@ -179,17 +179,15 @@ The dataset `result_data` contains `r dim(result_data)[1]` observations of `r di
 name_data <- 
   read_csv(file = "./data/Popular_Baby_Names.csv") %>%
   janitor::clean_names() %>%
-  distinct() %>%
-  mutate(gender = str_to_lower(gender),
+  distinct() %>%  ## delete duplicate rows
+  mutate(gender = str_to_lower(gender),  ## uniform case structure of string variables
          ethnicity = str_to_lower(ethnicity),
          childs_first_name = str_to_title(childs_first_name),
-         ethnicity = replace(ethnicity, ethnicity == "asian and paci", "asian and pacific islander"),
+         ethnicity = replace(ethnicity, ethnicity == "asian and paci", "asian and pacific islander"), ## uniform the names of catergories of ethinicity
          ethnicity = replace(ethnicity, ethnicity == "black non hisp", "black non hispanic"),
          ethnicity = replace(ethnicity, ethnicity == "white non hisp", "white non hispanic")) %>%
   rename(year = year_of_birth)
 ```
-
-Note that, although these data may seem fairly well formatted initially, the names of a categorical predictor and the case structure of string variables changed over time; you’ll need to address this in your data cleaning. Also, some rows seem duplicated, and these will need to be removed (hint: google something like “dplyr remove duplicate rows” to get started).
 
 ### Produce the rank in popularity of the name “Olivia”
 
