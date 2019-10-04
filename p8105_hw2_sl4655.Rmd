@@ -9,6 +9,7 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
+library(kableExtra)
 ```
 
 # _Problem 1_
@@ -174,14 +175,51 @@ The dataset `result_data` contains `r dim(result_data)[1]` observations of `r di
 
 ### Load and tidy the data
 
-```{r name_data, message = FALSE}
+```{r name_data, message = FALSE, warning = FALSE}
 name_data <- 
   read_csv(file = "./data/Popular_Baby_Names.csv") %>%
-  janitor::clean_names()
+  janitor::clean_names() %>%
+  distinct() %>%
+  mutate(gender = str_to_lower(gender),
+         ethnicity = str_to_lower(ethnicity),
+         childs_first_name = str_to_title(childs_first_name),
+         ethnicity = replace(ethnicity, ethnicity == "asian and paci", "asian and pacific islander"),
+         ethnicity = replace(ethnicity, ethnicity == "black non hisp", "black non hispanic"),
+         ethnicity = replace(ethnicity, ethnicity == "white non hisp", "white non hispanic")) %>%
+  rename(year = year_of_birth)
 ```
 
 Note that, although these data may seem fairly well formatted initially, the names of a categorical predictor and the case structure of string variables changed over time; you’ll need to address this in your data cleaning. Also, some rows seem duplicated, and these will need to be removed (hint: google something like “dplyr remove duplicate rows” to get started).
 
-Produce a well-structured, reader-friendly table showing the rank in popularity of the name “Olivia” as a female baby name over time; this should have rows for ethnicities and columns for year. Produce a similar table showing the most popular name among male children over time.
+### Produce the rank in popularity of the name “Olivia”
 
-Finally, for male, white non-hispanic children born in 2016, produce a scatter plot showing the number of children with a name (y axis) against the rank in popularity of that name (x axis).
+```{r olivia}
+subset(name_data, childs_first_name == "Olivia" & gender == "female") %>%
+  select(year, ethnicity, rank) %>% 
+  pivot_wider(names_from = "ethnicity",
+              values_from = "rank") %>%
+  kable(caption = "Table 3.1: Rank Popularity of 'Olivia'")
+```
+
+### The most popular name among male children
+
+```{r male}
+subset(name_data, rank == 1 & gender == "male") %>%
+  select(year, ethnicity, childs_first_name) %>% 
+  pivot_wider(names_from = "ethnicity",
+              values_from = "childs_first_name") %>%
+  kable(caption = "Table 3.2: The Most Popular Name among Male Children")
+```
+
+### Produce a scatter plot
+
+```{r scatterplot}
+subset(name_data, gender == "male" & year == "2016" & ethnicity != "hispanic") %>%  ## subset for male, white non-hispanic children born in 2016
+  ggplot(aes(x = rank, y = count)) + 
+  geom_point() + 
+  labs(
+    title = "Number of Children v.s. Rank of Popularity",
+    y = "Number of Children with a Name",
+    x = "Rank in Popularity of That Name",
+    caption = "Table 3.1: for male, white non-hispanic children born in 2016")
+```
